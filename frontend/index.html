@@ -1,0 +1,2459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Trading Dashboard</title>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4"></script>
+
+    <!-- Application Styles -->
+    <link rel="stylesheet" href="styles.css?v=20261014-5">
+</head>
+
+<body>
+
+    <!-- =========================================================
+         HEADER
+    ========================================================== -->
+    <header class="topbar">
+
+        <div class="brand">
+            <div class="brand-title">
+                Trading Dashboard
+            </div>
+
+            <div class="brand-subtitle">
+                Comparative Market Analysis
+            </div>
+        </div>
+
+        <div class="connection-area">
+
+            <div
+                id="connection-status"
+                class="connection-status disconnected"
+            >
+                <span class="status-dot"></span>
+
+                <span id="connection-text">
+                    Disconnected
+                </span>
+            </div>
+
+            <button
+                id="connect-btn"
+                class="btn btn-primary"
+                type="button"
+            >
+                Connect
+            </button>
+
+            <button
+                id="disconnect-btn"
+                class="btn btn-secondary"
+                type="button"
+                disabled
+            >
+                Disconnect
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================================================
+         MAIN DASHBOARD
+    ========================================================== -->
+    <main class="dashboard-container">
+
+
+        <!-- =====================================================
+             PORTFOLIO SUMMARY
+        ====================================================== -->
+        <section class="summary-grid analysis-only-hidden">
+
+            <div class="summary-card">
+
+                <div class="summary-label">
+                    Portfolio Value
+                </div>
+
+                <div
+                    id="portfolio-value"
+                    class="summary-value"
+                >
+                    $100,000.00
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-label">
+                    Today's P&L
+                </div>
+
+                <div
+                    id="today-pnl"
+                    class="summary-value"
+                >
+                    $0.00
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-label">
+                    Total P&L
+                </div>
+
+                <div
+                    id="total-pnl"
+                    class="summary-value"
+                >
+                    $0.00
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-label">
+                    Active Strategies
+                </div>
+
+                <div
+                    id="active-strategies"
+                    class="summary-value"
+                >
+                    0
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             MARKET ANALYSIS
+        ====================================================== -->
+        <section class="dashboard-section">
+
+            <!-- Section Header -->
+            <div class="section-header">
+
+                <div>
+
+                    <span class="section-eyebrow">
+                        MARKET ANALYSIS
+                    </span>
+
+                    <h1>
+                        Analysis Workspace
+                    </h1>
+
+                    <p>
+                        Compare independent perspectives and understand
+                        where the evidence agrees or disagrees.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="analysis-view-switch" role="tablist" aria-label="Analysis view">
+                <button id="current-analysis-tab" class="analysis-view-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="current-analysis-workspace current-analysis-panel">
+                    Present / Recent
+                </button>
+                <button id="historical-analysis-tab" class="analysis-view-tab" type="button" role="tab" aria-selected="false" aria-controls="historical-analysis-panel">
+                    Historical
+                </button>
+            </div>
+
+            <div id="current-analysis-workspace" class="current-analysis-workspace">
+
+
+            <!-- =================================================
+                 CHART CONTROLS
+            ================================================== -->
+            <div class="chart-controls">
+
+                <div class="control-group">
+
+                    <label for="stock-select">
+                        Stock
+                    </label>
+
+                    <select id="stock-select">
+
+                        <option value="AAPL">
+                            AAPL — Apple
+                        </option>
+
+                        <option value="MSFT">
+                            MSFT — Microsoft
+                        </option>
+
+                        <option value="GOOGL">
+                            GOOGL — Alphabet
+                        </option>
+
+                        <option value="AMZN">
+                            AMZN — Amazon
+                        </option>
+
+                        <option value="NVDA">
+                            NVDA — NVIDIA
+                        </option>
+
+                        <option value="TSLA">
+                            TSLA — Tesla
+                        </option>
+
+                        <option value="META">
+                            META — Meta
+                        </option>
+
+                    </select>
+
+                    <div class="custom-symbol-control">
+                        <input
+                            id="custom-symbol-input"
+                            data-stock-search-input
+                            type="text"
+                            maxlength="12"
+                            autocomplete="off"
+                            placeholder="Ticker or company, e.g. NVDA"
+                            aria-label="Custom stock ticker"
+                            role="combobox"
+                            aria-autocomplete="list"
+                            aria-haspopup="listbox"
+                            aria-expanded="false"
+                            aria-controls="stock-search-suggestions"
+                            aria-activedescendant=""
+                        >
+                        <button
+                            id="custom-symbol-btn"
+                            class="btn btn-secondary"
+                            type="button"
+                        >
+                            Analyze
+                        </button>
+                        <div
+                            id="stock-search-suggestions"
+                            data-stock-search-list
+                            class="stock-search-suggestions"
+                            role="listbox"
+                            aria-label="Stock search suggestions"
+                            hidden
+                        >
+                            <div id="stock-search-status" data-stock-search-status class="stock-search-status" role="status" aria-live="polite" hidden></div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="control-group">
+
+                    <label for="period-select">
+                        Period
+                    </label>
+
+                    <select id="period-select">
+
+                        <option value="1d">
+                            1 Day
+                        </option>
+
+                        <option value="5d">
+                            5 Days
+                        </option>
+
+                        <option
+                            value="1mo"
+                            selected
+                        >
+                            1 Month
+                        </option>
+
+                        <option value="3mo">
+                            3 Months
+                        </option>
+
+                        <option value="6mo">
+                            6 Months
+                        </option>
+
+                        <option value="1y">
+                            1 Year
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="control-group">
+
+                    <label for="interval-select">
+                        Interval
+                    </label>
+
+                    <select id="interval-select">
+
+                        <option value="1m">
+                            1 Minute
+                        </option>
+
+                        <option value="5m">
+                            5 Minutes
+                        </option>
+
+                        <option value="15m">
+                            15 Minutes
+                        </option>
+
+                        <option value="30m">
+                            30 Minutes
+                        </option>
+
+                        <option value="1h">
+                            1 Hour
+                        </option>
+
+                        <option
+                            value="1d"
+                            selected
+                        >
+                            1 Day
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="chart-refresh-wrapper">
+
+                    <button
+                        id="refresh-chart-btn"
+                        class="btn btn-primary chart-refresh-btn"
+                        type="button"
+                    >
+                        Refresh Chart
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 STOCK OVERVIEW
+            ================================================== -->
+            <div class="stock-overview">
+
+                <div class="stock-identity">
+
+                    <span
+                        id="current-symbol"
+                        class="stock-symbol"
+                    >
+                        AAPL
+                    </span>
+
+                    <span class="stock-name">
+                        Market Price
+                    </span>
+
+                </div>
+
+
+                <div class="stock-price-container">
+
+                    <span
+                        id="current-stock-price"
+                        class="stock-price"
+                    >
+                        --
+                    </span>
+
+                    <span
+                        id="current-stock-change"
+                        class="stock-change"
+                    >
+                        --
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 PRICE CHART
+            ================================================== -->
+            <div class="chart-wrapper">
+
+                <div class="chart-header">
+
+                    <div>
+
+                        <h2>
+                            Price Chart
+                        </h2>
+
+                        <span
+                            id="strategy-overlay-status"
+                            class="chart-status"
+                        >
+                            Market data
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="chart-container">
+
+                    <canvas id="stockChart"></canvas>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 CHART STATISTICS
+            ================================================== -->
+            <div class="chart-stats">
+
+                <div class="chart-stat">
+
+                    <span class="stat-label">
+                        Current
+                    </span>
+
+                    <span
+                        id="stat-current"
+                        class="stat-value"
+                    >
+                        --
+                    </span>
+
+                </div>
+
+
+                <div class="chart-stat">
+
+                    <span class="stat-label">
+                        Open
+                    </span>
+
+                    <span
+                        id="stat-open"
+                        class="stat-value"
+                    >
+                        --
+                    </span>
+
+                </div>
+
+
+                <div class="chart-stat">
+
+                    <span class="stat-label">
+                        High
+                    </span>
+
+                    <span
+                        id="stat-high"
+                        class="stat-value"
+                    >
+                        --
+                    </span>
+
+                </div>
+
+
+                <div class="chart-stat">
+
+                    <span class="stat-label">
+                        Low
+                    </span>
+
+                    <span
+                        id="stat-low"
+                        class="stat-value"
+                    >
+                        --
+                    </span>
+
+                </div>
+
+
+                <div class="chart-stat">
+
+                    <span class="stat-label">
+                        Change
+                    </span>
+
+                    <span
+                        id="stat-change"
+                        class="stat-value"
+                    >
+                        --
+                    </span>
+
+                </div>
+
+            </div>
+
+            </div>
+
+            <div id="historical-analysis-panel" class="analysis-tab-panel" role="tabpanel" aria-labelledby="historical-analysis-tab" hidden>
+            <section class="historical-check-section">
+                <div class="historical-check-heading">
+                    <div>
+                        <span class="section-eyebrow">HISTORICAL CHECK</span>
+                        <h2>Would this analysis have been right?</h2>
+                        <p>Choose a past date. The strategy uses only information available up to that date, then compares the signal with what happened afterward.</p>
+                    </div>
+                    <span class="historical-badge">No look-ahead data</span>
+                </div>
+
+                <div class="historical-check-controls">
+                    <div class="control-group historical-symbol-search-group">
+                        <label for="historical-symbol-input">Search historical stock</label>
+                        <div class="custom-symbol-control">
+                            <input
+                                id="historical-symbol-input"
+                                data-stock-search-input
+                                type="text"
+                                maxlength="12"
+                                autocomplete="off"
+                                placeholder="Type a ticker or company name"
+                                aria-label="Historical stock ticker or company"
+                                role="combobox"
+                                aria-autocomplete="list"
+                                aria-haspopup="listbox"
+                                aria-expanded="false"
+                                aria-controls="historical-stock-search-suggestions"
+                            >
+                            <button id="historical-symbol-btn" class="btn btn-secondary" type="button">Use stock</button>
+                            <div
+                                id="historical-stock-search-suggestions"
+                                data-stock-search-list
+                                class="stock-search-suggestions"
+                                role="listbox"
+                                aria-label="Historical stock search suggestions"
+                                hidden
+                            >
+                                <div id="historical-stock-search-status" data-stock-search-status class="stock-search-status" role="status" aria-live="polite" hidden></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="historical-date">Cutoff date</label>
+                        <input id="historical-date" type="date">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="historical-strategy">Strategy</label>
+                        <select id="historical-strategy">
+                            <option value="moving_average_crossover">Moving Average Crossover</option>
+                            <option value="mean_reversion">Mean Reversion</option>
+                            <option value="momentum_trading">Momentum Trading</option>
+                            <option value="breakout_strategy">Breakout Strategy</option>
+                            <option value="swing_trading">Swing Trading</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="historical-horizon">Evaluate after</label>
+                        <select id="historical-horizon">
+                            <option value="5">5 trading days</option>
+                            <option value="10" selected>10 trading days</option>
+                            <option value="20">20 trading days</option>
+                            <option value="30">30 trading days</option>
+                        </select>
+                    </div>
+
+                    <button id="historical-check-btn" class="btn btn-primary" type="button">Compare history</button>
+                </div>
+
+                <section class="historical-price-chart" aria-labelledby="historical-chart-heading">
+                    <div class="historical-chart-heading">
+                        <div>
+                            <span class="analysis-label">PRICE HISTORY</span>
+                            <h3 id="historical-chart-heading">Price through selected date</h3>
+                        </div>
+                        <span id="historical-chart-cutoff" class="historical-chart-cutoff">Choose a date to load its price history</span>
+                    </div>
+                    <div class="historical-chart-canvas-wrap">
+                        <canvas id="historicalPriceChart" role="img" aria-label="Historical closing price chart ending at the selected cutoff date"></canvas>
+                    </div>
+                    <p id="historical-chart-caption" class="historical-chart-caption">The chart will include only daily prices available on or before the cutoff date.</p>
+                </section>
+
+                <section class="historical-price-chart historical-evaluation-chart" aria-labelledby="historical-evaluation-chart-heading">
+                    <div class="historical-chart-heading">
+                        <div>
+                            <span class="analysis-label">EVALUATION WINDOW</span>
+                            <h3 id="historical-evaluation-chart-heading">Cutoff close and following trading sessions</h3>
+                        </div>
+                        <span id="historical-evaluation-chart-range" class="historical-chart-cutoff">Waiting for comparison</span>
+                    </div>
+                    <div class="historical-chart-legend" aria-label="Chart markers">
+                        <span><i class="historical-legend-dot cutoff"></i>Cutoff close</span>
+                        <span><i class="historical-legend-dot session"></i>Following trading sessions</span>
+                    </div>
+                    <div class="historical-chart-canvas-wrap historical-evaluation-canvas-wrap">
+                        <canvas id="historicalEvaluationChart" role="img" aria-label="Daily closing prices from the historical cutoff through the selected evaluation horizon"></canvas>
+                    </div>
+                    <p id="historical-evaluation-chart-caption" class="historical-chart-caption">The evaluation window will list each trading session after the cutoff in order.</p>
+                </section>
+
+                <div id="historical-result" class="historical-result" aria-live="polite">Select a cutoff date to compare a past analysis with its later outcome.</div>
+
+                <div id="historical-evidence" class="historical-evidence" aria-live="polite">
+                    <div class="historical-evidence-empty">
+                        No historical evaluation yet. Choose a date and compare the signal against the next market move.
+                    </div>
+                </div>
+            </section>
+
+            <section class="historical-matrix-section" aria-labelledby="historical-matrix-heading">
+                <div class="matrix-heading">
+                    <div>
+                        <span class="section-eyebrow">HISTORICAL MATRIX</span>
+                        <h2 id="historical-matrix-heading">Evidence at the selected cutoff</h2>
+                        <p>Historical signal, realized outcome, and cutoff-date news are kept separate from current market analysis.</p>
+                    </div>
+                    <span id="historical-matrix-date" class="historical-badge">No historical result</span>
+                </div>
+
+                <div id="historical-matrix-summary" class="historical-matrix-summary" aria-live="polite">
+                    Run a historical comparison to populate this view. Current analysis remains in its own tab.
+                </div>
+
+                <div class="historical-matrix-grid">
+                    <article class="historical-matrix-item">
+                        <div class="historical-matrix-item-heading">
+                            <span class="lens-icon">T</span>
+                            <strong>Strategy signal</strong>
+                            <span id="historical-technical-state" class="lens-state state-neutral">Pending</span>
+                        </div>
+                        <p id="historical-technical-detail">The selected strategy will be evaluated using data through the cutoff date.</p>
+                    </article>
+
+                    <article class="historical-matrix-item">
+                        <div class="historical-matrix-item-heading">
+                            <span class="lens-icon lens-icon-momentum">M</span>
+                            <strong>Price outcome</strong>
+                            <span id="historical-outcome-state" class="lens-state state-neutral">Pending</span>
+                        </div>
+                        <p id="historical-outcome-detail">The later price move will be compared with the signal direction.</p>
+                    </article>
+
+                    <article class="historical-matrix-item historical-matrix-item-wide">
+                        <div class="historical-matrix-item-heading">
+                            <span class="lens-icon lens-icon-sentiment">S</span>
+                            <strong>Cutoff-date news sentiment</strong>
+                            <span id="historical-sentiment-state" class="lens-state state-neutral">Pending</span>
+                        </div>
+                        <p id="historical-sentiment-detail">News published and last updated by the cutoff will appear here as context, separate from the price-direction score.</p>
+                    </article>
+                </div>
+
+                <div id="historical-analysis-status" class="historical-analysis-status" role="status" aria-live="polite" hidden>
+                    <span class="historical-analysis-status-indicator" aria-hidden="true"></span>
+                    <span id="historical-analysis-status-text"></span>
+                </div>
+            </section>
+            </div>
+
+            <div id="current-analysis-panel" class="analysis-tab-panel" role="tabpanel" aria-labelledby="current-analysis-tab">
+            <!-- =================================================
+                 ANALYSIS MATRIX
+            ================================================== -->
+            <section class="analysis-matrix-section">
+
+                <div class="matrix-heading">
+
+                    <div>
+
+                        <span class="section-eyebrow">
+                            ANALYSIS MATRIX
+                        </span>
+
+                        <h2>
+                            What each lens is observing
+                        </h2>
+
+                        <p>
+                            A descriptive view of the evidence. No buy or
+                            sell verdict is produced here.
+                        </p>
+
+                    </div>
+
+                    <div class="matrix-badge">
+                        <span class="matrix-badge-dot"></span>
+                        No aggregated verdict
+                    </div>
+
+                </div>
+
+                <div id="analysis-matrix" class="analysis-matrix-grid">
+
+                    <article class="lens-card lens-card-technical">
+                        <div class="lens-card-topline">
+                            <span class="lens-icon">T</span>
+                            <span class="lens-method">Technical</span>
+                            <span id="technical-state" class="lens-state state-neutral">Pending</span>
+                        </div>
+                        <strong id="technical-title">Price structure</strong>
+                        <p id="technical-detail">Load market data to inspect trend and recent change.</p>
+                        <details class="lens-explainer">
+                            <summary>What it means</summary>
+                            <p>Technical analysis studies the asset's own price and trading volume. The selected-period reference is the first available closing price in the chart period you chose; the percentage compares the latest close with that starting close. Volume is the number of shares traded during a session, which helps show how much participation supported a price move. Positive or negative describes past price evidence, not a forecast.</p>
+                        </details>
+                        <div class="lens-meter"><span id="technical-meter"></span></div>
+                    </article>
+
+                    <article class="lens-card">
+                        <div class="lens-card-topline">
+                            <span class="lens-icon lens-icon-fundamental">F</span>
+                            <span class="lens-method">Fundamental</span>
+                            <span id="fundamental-state" class="lens-state state-pending">Pending</span>
+                        </div>
+                        <strong>Business quality & valuation</strong>
+                        <p id="fundamental-detail">Load SEC EDGAR facts for revenue, earnings, assets, and debt.</p>
+                        <details class="lens-explainer">
+                            <summary>What it means</summary>
+                            <p>SEC EDGAR reports company figures from official filings. A 10-K is the company's detailed annual report; a 10-Q is its quarterly report. Revenue is the total money earned from sales before expenses. Net income is the profit left after reported operating costs, interest, taxes, and other expenses. Net margin is net income divided by revenue: 31.2% means the company kept about $31.20 as reported profit for every $100 of revenue. These are historical reported figures, not a fair-value estimate.</p>
+                        </details>
+                        <div id="fundamental-source" class="lens-source">Source: waiting for SEC EDGAR</div>
+                    </article>
+
+                    <article class="lens-card">
+                        <div class="lens-card-topline">
+                            <span class="lens-icon lens-icon-momentum">M</span>
+                            <span class="lens-method">Momentum</span>
+                            <span id="momentum-state" class="lens-state state-neutral">Pending</span>
+                        </div>
+                        <strong>Relative strength</strong>
+                        <p id="momentum-detail">Compare performance across the selected period and against a benchmark.</p>
+                        <details class="lens-explainer">
+                            <summary>What it means</summary>
+                            <p>Momentum, or relative strength, describes whether an asset has been gaining or losing value faster than a comparison. Relative return equals this asset's return minus SPY's return over the analysis period, normally 3 months. SPY is an ETF designed to track the S&P 500 and is used as the broad-market benchmark. For example, +8% means the asset gained 8 percentage points more than SPY. XLK is a technology-sector ETF used as sector context, not the benchmark. This measures past relative performance, not future direction.</p>
+                        </details>
+                        <div class="lens-source">Benchmark: SPY | Sector context: XLK</div>
+                    </article>
+
+                    <article class="lens-card">
+                        <div class="lens-card-topline">
+                            <span class="lens-icon lens-icon-risk">V</span>
+                            <span class="lens-method">Volatility</span>
+                            <span id="volatility-state" class="lens-state state-pending">Pending</span>
+                        </div>
+                        <strong>Range & uncertainty</strong>
+                        <p id="volatility-detail">Measure realized volatility, drawdown, and the stability of the current move.</p>
+                        <details class="lens-explainer">
+                            <summary>What it means</summary>
+                            <p>Realized volatility uses the last 20 daily closing returns. Standard deviation measures how far those daily returns usually differ from their average; annualizing it makes the value easier to compare across assets. Higher volatility means wider, less predictable price swings. ATR(14) uses 14 daily sessions of high, low, and previous close to estimate a typical one-day price range as a percent of the current price. Max drawdown is the largest peak-to-trough fall in the selected chart history: the decline from a previous highest closing value to a later lowest value before a new high. A -10% drawdown means the asset fell 10% from that previous peak.</p>
+                        </details>
+                        <div id="volatility-source" class="lens-source">Risk metrics: waiting for Alpaca</div>
+                    </article>
+
+                    <article class="lens-card">
+                        <div class="lens-card-topline">
+                            <span class="lens-icon lens-icon-sentiment">S</span>
+                            <span class="lens-method">Sentiment</span>
+                            <span id="sentiment-state" class="lens-state state-pending">Pending</span>
+                        </div>
+                        <strong>News & market narrative</strong>
+                        <p id="sentiment-detail">Load recent headlines separately from price evidence.</p>
+                        <details class="lens-explainer">
+                            <summary>What it means</summary>
+                            <p>Sentiment summarizes up to 10 recent Alpaca News headlines for this symbol. Mixed means the wording contains both positive and negative terms. It measures narrative tone, not whether the price will rise or fall.</p>
+                        </details>
+                        <div id="sentiment-source" class="lens-source">Source: waiting for Alpaca News</div>
+                    </article>
+
+                    <article class="lens-card lens-card-quant">
+                        <div class="lens-card-topline">
+                            <span class="lens-icon lens-icon-quant">Q</span>
+                            <span class="lens-method">Quantitative</span>
+                            <span id="quant-state" class="lens-state state-pending">Pending</span>
+                        </div>
+                        <strong>Factors & correlations</strong>
+                        <p id="quant-detail">Expose factor exposure and correlation so repeated evidence is not counted twice.</p>
+                        <details class="lens-explainer">
+                            <summary>What it means</summary>
+                            <p>Correlation is the Pearson correlation between aligned daily returns, from -1 to +1. A daily return is the percentage price change from one session's close to the next. SPY is the broad S&P 500 benchmark ETF; XLK is the technology-sector ETF used for comparison. Near +1 means the asset and comparison usually move in the same direction; near -1 means opposite directions; near 0 means little linear relationship. Correlation describes co-movement, not causation.</p>
+                        </details>
+                        <div id="quant-source" class="lens-source">Benchmark model: waiting for Alpaca</div>
+                    </article>
+
+                    <article class="lens-card lens-card-macro">
+                        <div class="lens-card-topline">
+                            <span class="lens-icon lens-icon-macro">X</span>
+                            <span class="lens-method">Macro</span>
+                            <span id="macro-state" class="lens-state state-pending">Needs setup</span>
+                        </div>
+                        <strong>Rates, prices & growth</strong>
+                        <p id="macro-detail">Add a FRED API key to load macroeconomic context.</p>
+                        <details class="lens-explainer">
+                            <summary>What it means</summary>
+                            <p>Macro data describes the wider economy, not this company alone. FRED supplies the federal funds rate, CPI, unemployment, and real GDP. Each value has its own reporting frequency and latest observation date, so do not compare them as if they were daily indicators.</p>
+                        </details>
+                        <div id="macro-source" class="lens-source">Source: FRED</div>
+                    </article>
+
+                </div>
+
+                <div class="matrix-reading">
+                    <div>
+                        <span class="analysis-label">Reading the matrix</span>
+                        <strong id="matrix-reading-title">Waiting for a price update</strong>
+                    </div>
+                    <p id="matrix-reading-detail">Each method will report its own evidence. Missing sources stay visible instead of being replaced with a guessed score.</p>
+                </div>
+
+                <div class="indicator-guide">
+                    <div class="indicator-guide-heading">
+                        <div>
+                            <span class="analysis-label">Indicator guide</span>
+                            <strong>How to read the numbers</strong>
+                        </div>
+                        <span class="indicator-guide-note">Context, not a recommendation</span>
+                    </div>
+
+                    <div class="indicator-guide-grid">
+                        <div class="guide-item">
+                            <strong>Relative return</strong>
+                            <p>Asset return minus the benchmark return. Positive means it outperformed the benchmark during the selected analysis period.</p>
+                        </div>
+                        <div class="guide-item">
+                            <strong>Realized volatility</strong>
+                            <p>Annualized estimate of how widely daily returns have moved. Higher values mean more uncertainty and larger expected swings.</p>
+                        </div>
+                        <div class="guide-item">
+                            <strong>ATR(14)</strong>
+                            <p>Average true range over 14 sessions, shown as a percentage of price. It estimates a typical daily movement.</p>
+                        </div>
+                        <div class="guide-item">
+                            <strong>Max drawdown</strong>
+                            <p>Largest fall from a previous peak in the selected data. A value of -10% means the asset lost 10% from its high.</p>
+                        </div>
+                        <div class="guide-item">
+                            <strong>Correlation</strong>
+                            <p>Relationship between returns, from -1 to +1. Near +1 means they tend to move together; near 0 means little linear relationship.</p>
+                        </div>
+                        <div class="guide-item">
+                            <strong>Net margin</strong>
+                            <p>Net income divided by revenue. It shows how much of each revenue dollar remains after reported expenses.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- =================================================
+                 PRELIMINARY STRATEGY SELECTION
+
+                 Selecting a strategy ONLY generates analysis.
+                 It does NOT execute a trade.
+            ================================================== -->
+            <section class="strategy-selector">
+
+                <div class="strategy-selector-content">
+
+                    <span class="section-eyebrow">
+                        TECHNICAL METHOD
+                    </span>
+
+                    <h2>
+                        Choose a Technical Method
+                    </h2>
+
+                    <p>
+                        Select a method to inspect price behavior for
+                        the current asset and chart period.
+                    </p>
+
+                    <p class="strategy-warning">
+                        This analysis does not automatically execute
+                        any trade.
+                    </p>
+
+                </div>
+
+
+                <div class="strategy-selector-control">
+
+                    <label for="strategy-select">
+                        Strategy
+                    </label>
+
+                    <select id="strategy-select">
+
+                        <option value="">
+                            -- Select a Strategy --
+                        </option>
+
+                        <option value="moving_average_crossover">
+                            Moving Average Crossover
+                        </option>
+
+                        <option value="mean_reversion">
+                            Mean Reversion
+                        </option>
+
+                        <option value="momentum_trading">
+                            Momentum Trading
+                        </option>
+
+                        <option value="breakout_strategy">
+                            Breakout Strategy
+                        </option>
+
+                        <option value="swing_trading">
+                            Swing Trading
+                        </option>
+
+                    </select>
+
+
+                    <div
+                        id="strategy-description"
+                        class="strategy-description"
+                    >
+                        Select a strategy to see its description.
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- =================================================
+                        TECHNICAL EVIDENCE
+            ================================================== -->
+            <section
+                id="strategy-analysis"
+                class="strategy-analysis"
+            >
+
+                <!-- Analysis Header -->
+                <div class="analysis-header">
+
+                    <div>
+
+                        <span class="section-eyebrow">
+                            PRELIMINARY STRATEGY ANALYSIS
+                        </span>
+
+                        <h2>
+                            Review the Technical Evidence
+                        </h2>
+
+                        <p>
+                            Review the method output, reasoning,
+                            indicators, and risk considerations alongside
+                            the other analysis lenses.
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        id="analysis-status"
+                        class="analysis-status"
+                    >
+                        No strategy selected
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     SIGNAL
+                ================================================== -->
+                <div class="analysis-signal-card">
+
+                    <div class="signal-main">
+
+                        <span class="analysis-label">
+                            Observed Direction
+                        </span>
+
+                        <div
+                            id="strategy-signal"
+                            class="strategy-signal neutral"
+                        >
+                            NO TRADE
+                        </div>
+
+                    </div>
+
+
+                    <div class="signal-strength">
+
+                        <span class="analysis-label">
+                            Evidence Quality
+                        </span>
+
+                        <div
+                            id="strategy-strength"
+                            class="strength-value"
+                        >
+                            --
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     STRATEGY INFORMATION
+                ================================================== -->
+                <div class="analysis-grid">
+
+                    <div class="analysis-card">
+
+                        <span class="analysis-label">
+                            Strategy
+                        </span>
+
+                        <h3 id="analysis-strategy-name">
+                            --
+                        </h3>
+
+                    </div>
+
+
+                    <div class="analysis-card">
+
+                        <span class="analysis-label">
+                            Current Price
+                        </span>
+
+                        <h3 id="analysis-current-price">
+                            --
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     STRATEGY REASONING
+                ================================================== -->
+                <div class="analysis-card analysis-wide">
+
+                    <div class="analysis-card-header">
+
+                        <span class="analysis-icon">
+                            WHY
+                        </span>
+
+                        <h3>
+                            Strategy Reasoning
+                        </h3>
+
+                    </div>
+
+
+                    <div
+                        id="strategy-reasoning"
+                        class="analysis-content"
+                    >
+                        Select a strategy to generate an analysis.
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     INDICATORS
+                ================================================== -->
+                <div class="analysis-card analysis-wide">
+
+                    <div class="analysis-card-header">
+
+                        <span class="analysis-icon">
+                            IND
+                        </span>
+
+                        <h3>
+                            Indicators
+                        </h3>
+
+                    </div>
+
+
+                    <div
+                        id="strategy-indicators"
+                        class="indicators-grid"
+                    >
+
+                        <div class="indicator-item">
+
+                            <span class="indicator-name">
+                                No data
+                            </span>
+
+                            <span class="indicator-value">
+                                --
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     RISK CONSIDERATIONS
+                ================================================== -->
+                <div class="analysis-card analysis-wide">
+
+                    <div class="analysis-card-header">
+
+                        <span class="analysis-icon">
+                            RISK
+                        </span>
+
+                        <h3>
+                            Risk Considerations
+                        </h3>
+
+                    </div>
+
+
+                    <div
+                        id="strategy-risk"
+                        class="analysis-content risk-content"
+                    >
+                        No risk analysis available.
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     MANUAL DECISION
+                ================================================== -->
+                <div class="decision-panel">
+
+                    <div class="decision-header">
+
+                        <div>
+
+                            <span class="section-eyebrow">
+                                DECISION
+                            </span>
+
+                            <h3>
+                                What do you want to do?
+                            </h3>
+
+                            <p>
+                                The preliminary strategy analysis
+                                does not execute trades automatically.
+                                Your decision is always manual.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="decision-buttons">
+
+                        <button
+                            id="analysis-buy-btn"
+                            class="decision-btn buy-btn"
+                            type="button"
+                            disabled
+                        >
+                            BUY
+                        </button>
+
+
+                        <button
+                            id="analysis-sell-btn"
+                            class="decision-btn sell-btn"
+                            type="button"
+                            disabled
+                        >
+                            SELL
+                        </button>
+
+
+                        <button
+                            id="analysis-no-trade-btn"
+                            class="decision-btn no-trade-btn"
+                            type="button"
+                        >
+                            NO TRADE
+                        </button>
+
+                    </div>
+
+
+                    <div
+                        id="decision-status"
+                        class="decision-status"
+                    >
+                        Select a strategy to begin.
+                    </div>
+
+                </div>
+
+            </section>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             WATCHLIST
+        ====================================================== -->
+        <section class="dashboard-section watchlist-section analysis-only-hidden">
+
+            <div class="section-header">
+
+                <div>
+
+                    <span class="section-eyebrow">
+                        WATCHLIST
+                    </span>
+
+                    <h2>
+                        Market Watchlist
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="watchlist"
+                class="watchlist"
+            >
+
+                <div class="watchlist-item">
+
+                    <div class="watch-symbol">
+                        AAPL
+                    </div>
+
+                    <div class="watch-price">
+                        --
+                    </div>
+
+                    <div class="watch-change">
+                        --
+                    </div>
+
+                </div>
+
+
+                <div class="watchlist-item">
+
+                    <div class="watch-symbol">
+                        MSFT
+                    </div>
+
+                    <div class="watch-price">
+                        --
+                    </div>
+
+                    <div class="watch-change">
+                        --
+                    </div>
+
+                </div>
+
+
+                <div class="watchlist-item">
+
+                    <div class="watch-symbol">
+                        GOOGL
+                    </div>
+
+                    <div class="watch-price">
+                        --
+                    </div>
+
+                    <div class="watch-change">
+                        --
+                    </div>
+
+                </div>
+
+
+                <div class="watchlist-item">
+
+                    <div class="watch-symbol">
+                        NVDA
+                    </div>
+
+                    <div class="watch-price">
+                        --
+                    </div>
+
+                    <div class="watch-change">
+                        --
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+           <!-- =====================================================
+               RECENT TRADES
+           ====================================================== -->
+           <section class="dashboard-section analysis-only-hidden">
+
+            <div class="section-header">
+
+                <div>
+
+                    <span class="section-eyebrow">
+                        TRADE HISTORY
+                    </span>
+
+                    <h2>
+                        Recent Trades
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table class="trades-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Time</th>
+                            <th>Symbol</th>
+                            <th>Side</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                            <th>Strategy</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="trades-table-body">
+
+                        <tr>
+
+                            <td
+                                colspan="7"
+                                class="empty-table"
+                            >
+                                No recent trades.
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             MANUAL TRADE
+        ====================================================== -->
+        <section class="dashboard-section manual-trade-section analysis-only-hidden">
+
+            <div class="section-header">
+
+                <div>
+
+                    <span class="section-eyebrow">
+                        MANUAL TRADE
+                    </span>
+
+                    <h2>
+                        Execute a Trade
+                    </h2>
+
+                    <p>
+                        Enter the trade manually after reviewing
+                        the preliminary analysis.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <form
+                id="strategy-form"
+                class="trade-form"
+            >
+
+                <!-- =================================================
+                     TRADE INPUTS
+                ================================================== -->
+                <div class="form-grid">
+
+
+                    <!-- Stock Symbol -->
+                    <div class="form-group">
+
+                        <label for="symbol">
+                            Stock Symbol
+                        </label>
+
+                        <input
+                            id="symbol"
+                            name="symbol"
+                            type="text"
+                            value="AAPL"
+                            placeholder="AAPL"
+                            autocomplete="off"
+                        >
+
+                    </div>
+
+
+                    <!-- Quantity -->
+                    <div class="form-group">
+
+                        <label for="quantity">
+                            Quantity
+                        </label>
+
+                        <input
+                            id="quantity"
+                            name="quantity"
+                            type="number"
+                            min="1"
+                            step="1"
+                            value="1"
+                            placeholder="1"
+                        >
+
+                    </div>
+
+
+                    <!-- Trade Side -->
+                    <div class="form-group">
+
+                        <label for="trade-side">
+                            Trade Side
+                        </label>
+
+                        <select
+                            id="trade-side"
+                            name="side"
+                        >
+
+                            <option value="buy">
+                                BUY
+                            </option>
+
+                            <option value="sell">
+                                SELL
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     TRADE SUMMARY
+                ================================================== -->
+                <div class="trade-summary">
+
+                    <div class="trade-summary-row">
+
+                        <span>
+                            Symbol
+                        </span>
+
+                        <strong id="trade-summary-symbol">
+                            AAPL
+                        </strong>
+
+                    </div>
+
+
+                    <div class="trade-summary-row">
+
+                        <span>
+                            Quantity
+                        </span>
+
+                        <strong id="trade-summary-quantity">
+                            1
+                        </strong>
+
+                    </div>
+
+
+                    <div class="trade-summary-row">
+
+                        <span>
+                            Side
+                        </span>
+
+                        <strong id="trade-summary-side">
+                            BUY
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     TRADE NOTES
+                ================================================== -->
+                <div class="form-group">
+
+                    <label for="trade-summary">
+                        Trade Notes
+                    </label>
+
+                    <textarea
+                        id="trade-summary"
+                        name="summary"
+                        rows="4"
+                        placeholder="Optional notes about why you are making this trade..."
+                    ></textarea>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     EXECUTE TRADE
+                ================================================== -->
+                <div class="trade-submit-area">
+
+                    <button
+                        id="execute-btn"
+                        class="btn btn-primary execute-btn"
+                        type="submit"
+                    >
+                        Execute Trade
+                    </button>
+
+                </div>
+
+
+                <!-- Trade Status -->
+                <div
+                    id="trade-status"
+                    class="trade-status"
+                ></div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+
+
+    <!-- =========================================================
+         FOOTER
+    ========================================================== -->
+    <footer class="dashboard-footer">
+
+        <p>
+            Trading Dashboard
+        </p>
+
+        <p>
+            Preliminary strategy analysis is informational and
+            does not guarantee future market performance.
+        </p>
+
+    </footer>
+
+
+
+    <!-- =========================================================
+         APPLICATION JAVASCRIPT
+    ========================================================== -->
+    <script>
+        (function () {
+            const historicalDate = document.getElementById('historical-date');
+            const historicalStrategy = document.getElementById('historical-strategy');
+            const historicalHorizon = document.getElementById('historical-horizon');
+            const historicalButton = document.getElementById('historical-check-btn');
+            const historicalSymbolInput = document.getElementById('historical-symbol-input');
+            const historicalSymbolButton = document.getElementById('historical-symbol-btn');
+            const historicalResult = document.getElementById('historical-result');
+            const historicalEvidence = document.getElementById('historical-evidence');
+            const historicalChartCutoff = document.getElementById('historical-chart-cutoff');
+            const historicalChartCaption = document.getElementById('historical-chart-caption');
+            const historicalEvaluationChartRange = document.getElementById('historical-evaluation-chart-range');
+            const historicalEvaluationChartCaption = document.getElementById('historical-evaluation-chart-caption');
+            const historicalAnalysisStatus = document.getElementById('historical-analysis-status');
+            const historicalAnalysisStatusText = document.getElementById('historical-analysis-status-text');
+            const currentAnalysisTab = document.getElementById('current-analysis-tab');
+            const historicalAnalysisTab = document.getElementById('historical-analysis-tab');
+            const currentAnalysisWorkspace = document.getElementById('current-analysis-workspace');
+            const currentAnalysisPanel = document.getElementById('current-analysis-panel');
+            const historicalAnalysisPanel = document.getElementById('historical-analysis-panel');
+            const historicalLockedControls = [
+                historicalDate,
+                historicalStrategy,
+                historicalHorizon,
+                historicalSymbolInput,
+                historicalSymbolButton,
+                historicalButton,
+                document.getElementById('stock-select'),
+                document.getElementById('custom-symbol-input'),
+                document.getElementById('custom-symbol-btn'),
+                document.getElementById('period-select'),
+                document.getElementById('interval-select'),
+                document.getElementById('refresh-chart-btn'),
+                document.getElementById('strategy-select')
+            ].filter(Boolean);
+            let historicalMatrixResult = null;
+            let historicalFailureMessage = '';
+            let historicalPriceChart = null;
+            let historicalEvaluationChart = null;
+
+            function setAnalysisView(view) {
+                const showHistorical = view === 'historical';
+                historicalAnalysisPanel.hidden = !showHistorical;
+                currentAnalysisWorkspace.hidden = showHistorical;
+                currentAnalysisPanel.hidden = showHistorical;
+                historicalAnalysisTab.classList.toggle('is-active', showHistorical);
+                currentAnalysisTab.classList.toggle('is-active', !showHistorical);
+                historicalAnalysisTab.setAttribute('aria-selected', String(showHistorical));
+                currentAnalysisTab.setAttribute('aria-selected', String(!showHistorical));
+                if (!showHistorical) {
+                    requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
+                }
+            }
+
+            currentAnalysisTab.addEventListener('click', () => setAnalysisView('current'));
+            historicalAnalysisTab.addEventListener('click', () => setAnalysisView('historical'));
+
+            function escapeHtml(value) {
+                return String(value).replace(/[&<>"']/g, (character) => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                })[character]);
+            }
+
+            function renderHistoricalEvidence(result) {
+                if (!historicalEvidence) return;
+
+                const analysis = result?.analysis || {};
+                const indicators = analysis.indicators || {};
+                const sentiment = analysis.sentiment || {};
+                const reasoning = Array.isArray(analysis.reasoning) ? analysis.reasoning : [];
+                const riskNotes = Array.isArray(analysis.risk_notes) ? analysis.risk_notes : [];
+                const newsArticles = Array.isArray(sentiment.articles) ? sentiment.articles : [];
+                const summary = analysis.strategy || result?.strategy || 'Strategy';
+                const signal = (analysis.signal || result?.outcome?.signal || 'neutral').toUpperCase();
+                const currentPrice = analysis.current_price ?? result?.outcome?.entry_price;
+                const outcome = result?.outcome || {};
+                const futureReturn = outcome.future_return;
+                const movement = futureReturn > 0 ? 'rose' : futureReturn < 0 ? 'fell' : 'was unchanged';
+                const correctnessReason = outcome.correct === null
+                    ? 'The strategy returned a neutral signal, so no directional prediction was scored.'
+                    : outcome.correct
+                        ? `${signal} was marked correct because the price ${movement} ${(Math.abs(futureReturn) * 100).toFixed(2)}% over the selected horizon.`
+                        : `${signal} was marked incorrect because the price ${movement} ${(Math.abs(futureReturn) * 100).toFixed(2)}%, opposite to the signal direction.`;
+
+                const indicatorEntries = Object.entries(indicators)
+                    .map(([key, value]) => {
+                        const label = key.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+                        const normalizedValue = escapeHtml(value === null || value === undefined ? '—' : value);
+                        return `
+                            <div class="historical-indicator">
+                                <span class="historical-indicator-label">${escapeHtml(label)}</span>
+                                <span class="historical-indicator-value">${normalizedValue}</span>
+                            </div>
+                        `;
+                    })
+                    .join('');
+
+                const reasoningList = reasoning.length
+                    ? `<ul class="historical-evidence-list">${reasoning.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
+                    : '<p class="historical-evidence-empty">No reasoning details were returned for this cutoff date.</p>';
+
+                const riskList = riskNotes.length
+                    ? `<ul class="historical-evidence-list">${riskNotes.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
+                    : '<p class="historical-evidence-empty">No risk notes were returned.</p>';
+
+                const exitPrice = outcome.exit_price ?? '—';
+                const returnPercent = futureReturn == null ? '—' : `${(futureReturn * 100).toFixed(2)}%`;
+                const newsList = newsArticles.length
+                    ? `<ul class="historical-evidence-list">${newsArticles.map((article) => `<li><strong>${escapeHtml(article.headline)}</strong> <span>${escapeHtml(article.created_at || '')}</span></li>`).join('')}</ul>`
+                    : '<p class="historical-evidence-empty">' + escapeHtml(sentiment.message || 'No eligible historical news was returned.') + '</p>';
+                const sentimentSummary = sentiment.status === 'available'
+                    ? `${escapeHtml(sentiment.state)} sentiment from ${Number(sentiment.article_count || 0)} eligible headlines (up to 50 analyzed) in the 30-day window through ${escapeHtml(result?.cutoff_date || '')}. This is context, not part of the directional score.`
+                    : escapeHtml(sentiment.message || 'Historical news sentiment is unavailable for this date.');
+
+                historicalEvidence.innerHTML = `
+                    <div class="historical-evidence-grid">
+                        <div class="historical-evidence-card">
+                            <h3>Signal at cutoff</h3>
+                            <div class="historical-result-meta">
+                                <span class="historical-pill">Strategy: ${escapeHtml(summary)}</span>
+                                <span class="historical-pill">Signal: ${escapeHtml(signal)}</span>
+                                <span class="historical-pill">Price: $${Number(currentPrice || 0).toFixed(2)}</span>
+                            </div>
+                            ${reasoningList}
+                        </div>
+
+                        <div class="historical-evidence-card">
+                            <h3>Indicators on ${escapeHtml(result?.cutoff_date || 'the cutoff date')}</h3>
+                            <div class="historical-indicator-grid">
+                                ${indicatorEntries || '<div class="historical-evidence-empty">No strategy indicators were generated for this method.</div>'}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="historical-evidence-grid">
+                        <div class="historical-evidence-card">
+                            <h3>Why this was considered correct or incorrect</h3>
+                            <p class="historical-evidence-list">${escapeHtml(correctnessReason)} The comparison uses price return only; it does not include dividends, fees, or slippage.</p>
+                            <div class="historical-result-meta">
+                                <span class="historical-pill">Exit price: $${Number(exitPrice).toFixed(2)}</span>
+                                <span class="historical-pill">Return: ${returnPercent}</span>
+                            </div>
+                        </div>
+
+                        <div class="historical-evidence-card">
+                            <h3>Risk context</h3>
+                            ${riskList}
+                        </div>
+                    </div>
+
+                    <div class="historical-evidence-card historical-evidence-card-wide">
+                        <h3>Historical news sentiment</h3>
+                        <p class="historical-evidence-list">${sentimentSummary}</p>
+                        ${newsList}
+                    </div>
+                `;
+            }
+
+            function activeHistoricalSymbol() {
+                const selector = document.getElementById('stock-select');
+                return selector?.dataset.customSymbol || selector?.value || 'AAPL';
+            }
+
+            function setHistoricalResult(message, state = '') {
+                historicalResult.textContent = message;
+                historicalResult.className = 'historical-result ' + state;
+            }
+
+            function renderHistoricalPriceChart(result) {
+                const canvas = document.getElementById('historicalPriceChart');
+                const records = (result?.price_history || [])
+                    .filter((record) => record.timestamp.slice(0, 10) <= result.cutoff_date)
+                    .sort((left, right) => left.timestamp.localeCompare(right.timestamp));
+
+                historicalPriceChart?.destroy();
+                historicalPriceChart = null;
+
+                if (!records.length) {
+                    historicalChartCutoff.textContent = 'No price data available';
+                    historicalChartCaption.textContent = 'No daily prices were returned on or before ' + result.cutoff_date + '.';
+                    return;
+                }
+
+                const labels = records.map((record) => new Date(record.timestamp.slice(0, 10) + 'T12:00:00').toLocaleDateString());
+                const closes = records.map((record) => Number(record.close));
+                const lastRecord = records[records.length - 1];
+                const lastDate = lastRecord.timestamp.slice(0, 10);
+                const cutoffClose = closes[closes.length - 1];
+
+                historicalChartCutoff.textContent = 'Cutoff: ' + result.cutoff_date;
+                historicalChartCaption.textContent = records.length + ' daily closes through ' + lastDate + '. The final point marks the last available close on or before the selected cutoff: $' + cutoffClose.toFixed(2) + '. Later prices are not shown on this chart.';
+
+                if (typeof Chart === 'undefined') {
+                    historicalChartCaption.textContent = 'Chart library unavailable. The historical prices could not be drawn.';
+                    return;
+                }
+
+                historicalPriceChart = new Chart(canvas, {
+                    type: 'line',
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: result.symbol + ' close',
+                            data: closes,
+                            borderColor: '#2563eb',
+                            backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.18,
+                            pointRadius: (context) => context.dataIndex === closes.length - 1 ? 6 : 0,
+                            pointHoverRadius: 5,
+                            pointBackgroundColor: (context) => context.dataIndex === closes.length - 1 ? '#d97706' : '#2563eb',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { intersect: false, mode: 'index' },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: (context) => 'Close: $' + Number(context.parsed.y).toFixed(2)
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: { maxTicksLimit: 8, maxRotation: 0 }
+                            },
+                            y: {
+                                ticks: { callback: (value) => '$' + Number(value).toFixed(0) }
+                            }
+                        }
+                    }
+                });
+            }
+
+            function renderHistoricalEvaluationChart(result) {
+                const canvas = document.getElementById('historicalEvaluationChart');
+                const records = result?.evaluation_history || [];
+                historicalEvaluationChart?.destroy();
+                historicalEvaluationChart = null;
+
+                if (!records.length) {
+                    historicalEvaluationChartRange.textContent = 'No evaluation sessions available';
+                    historicalEvaluationChartCaption.textContent = result?.message || 'No daily bars were returned for the selected evaluation horizon.';
+                    return;
+                }
+
+                const labels = records.map((record) => new Date(record.timestamp.slice(0, 10) + 'T12:00:00').toLocaleDateString());
+                const closes = records.map((record) => Number(record.close));
+                const cutoffRecord = records[0];
+                const sessionRecords = records.slice(1);
+                const requestedSessions = Number(result.horizon_days || sessionRecords.length);
+                const availableSessions = Math.min(sessionRecords.length, requestedSessions);
+                const cutoffDate = cutoffRecord.timestamp.slice(0, 10);
+                const finalDate = records[records.length - 1].timestamp.slice(0, 10);
+                const outcomeReturn = Number(result.outcome?.future_return || 0);
+                const finalPointColor = outcomeReturn > 0 ? '#15803d' : outcomeReturn < 0 ? '#dc2626' : '#d97706';
+
+                historicalEvaluationChartRange.textContent = availableSessions + ' of ' + requestedSessions + ' trading sessions';
+                historicalEvaluationChartCaption.textContent = 'Cutoff close: ' + cutoffDate + ' at $' + closes[0].toFixed(2) + '. Then ' + availableSessions + ' consecutive market sessions through ' + finalDate + ', each shown in order.';
+
+                if (typeof Chart === 'undefined') {
+                    historicalEvaluationChartCaption.textContent = 'Chart library unavailable. The evaluation sessions could not be drawn.';
+                    return;
+                }
+
+                historicalEvaluationChart = new Chart(canvas, {
+                    type: 'line',
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: result.symbol + ' daily close',
+                            data: closes,
+                            borderColor: '#2563eb',
+                            backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.12,
+                            pointRadius: (context) => context.dataIndex === 0 || context.dataIndex === closes.length - 1 ? 5 : 3,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: (context) => context.dataIndex === 0 ? '#d97706' : context.dataIndex === closes.length - 1 ? finalPointColor : '#2563eb',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { intersect: false, mode: 'index' },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    title: (items) => items[0]?.label || '',
+                                    label: (context) => (context.dataIndex === 0 ? 'Cutoff close: $' : 'Session ' + context.dataIndex + ' close: $') + Number(context.parsed.y).toFixed(2)
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: {
+                                    autoSkip: false,
+                                    maxRotation: 45,
+                                    minRotation: 0,
+                                    font: { size: 10 }
+                                }
+                            },
+                            y: {
+                                ticks: { callback: (value) => '$' + Number(value).toFixed(0) }
+                            }
+                        }
+                    }
+                });
+            }
+
+            function setHistoricalAnalysisBusy(isBusy, symbol = '', cutoffDate = '') {
+                historicalLockedControls.forEach((control) => {
+                    control.disabled = isBusy;
+                });
+                historicalButton.textContent = isBusy ? 'Analyzing history...' : 'Compare history';
+                historicalButton.setAttribute('aria-busy', String(isBusy));
+                document.querySelector('.historical-check-section')?.classList.toggle('is-analyzing', isBusy);
+
+                if (isBusy) {
+                    historicalAnalysisStatus.hidden = false;
+                    historicalAnalysisStatus.className = 'historical-analysis-status is-loading';
+                    historicalAnalysisStatusText.textContent = 'Analyzing historical matrix for ' + symbol + ' through ' + cutoffDate + '. Historical controls are locked while the signal and outcome are being checked.';
+                } else if (historicalMatrixResult) {
+                    const outcome = historicalMatrixResult.outcome || {};
+                    const verdict = outcome.correct === null ? 'neutral signal' : outcome.correct ? 'direction matched' : 'direction did not match';
+                    historicalAnalysisStatus.hidden = false;
+                    historicalAnalysisStatus.className = 'historical-analysis-status is-complete';
+                    historicalAnalysisStatusText.textContent = 'Historical analysis ready for ' + (historicalMatrixResult.symbol || symbol) + ' on ' + (historicalMatrixResult.cutoff_date || cutoffDate) + ': ' + verdict + '. Historical evidence is shown separately from current analysis.';
+                } else if (historicalFailureMessage) {
+                    historicalAnalysisStatus.hidden = false;
+                    historicalAnalysisStatus.className = 'historical-analysis-status is-error';
+                    historicalAnalysisStatusText.textContent = historicalFailureMessage + ' Current analysis remains unchanged in its own tab.';
+                } else {
+                    historicalAnalysisStatus.hidden = true;
+                    historicalAnalysisStatus.className = 'historical-analysis-status';
+                }
+            }
+
+            function renderHistoricalMatrix(result) {
+                if (!result) return;
+
+                const analysis = result.analysis || {};
+                const outcome = result.outcome || {};
+                const sentiment = analysis.sentiment || {};
+                const signal = analysis.signal || outcome.signal || 'neutral';
+                const normalizedSignal = signal.toLowerCase();
+                const correct = outcome.correct;
+                const directionLabel = normalizedSignal === 'buy' ? 'Buy signal' : normalizedSignal === 'sell' ? 'Sell signal' : 'Neutral signal';
+                const signalClass = normalizedSignal === 'buy' ? 'state-positive' : normalizedSignal === 'sell' ? 'state-negative' : 'state-neutral';
+                const verdict = correct === null ? 'Not scored' : correct ? 'Direction matched' : 'Direction did not match';
+                const verdictClass = correct === null ? 'state-neutral' : correct ? 'state-positive' : 'state-negative';
+                const indicatorSummary = Object.entries(analysis.indicators || {})
+                    .map(([name, value]) => name.replace(/_/g, ' ') + ': ' + (value ?? 'n/a'))
+                    .join('; ');
+                const reasoning = (analysis.reasoning || []).join(' ');
+                const futureReturn = Number(outcome.future_return || 0);
+                const move = futureReturn > 0 ? 'rose' : futureReturn < 0 ? 'fell' : 'was unchanged';
+                const horizon = result.horizon_days || historicalHorizon.value;
+                const exitDate = outcome.exit_date ? new Date(outcome.exit_date).toLocaleDateString() : 'the evaluation date';
+                document.getElementById('historical-matrix-date').textContent = result.symbol + ' | ' + result.cutoff_date;
+                document.getElementById('historical-matrix-summary').textContent = (analysis.strategy || result.strategy || 'Selected strategy') + ' analyzed through ' + result.cutoff_date + '. Historical signal and later price outcome are reported below. News sentiment is contextual and does not change the strategy verdict.';
+
+                setState(document.getElementById('historical-technical-state'), directionLabel, signalClass);
+                document.getElementById('historical-technical-detail').textContent = (reasoning || 'No strategy rationale was returned.') + (indicatorSummary ? ' Indicators at cutoff: ' + indicatorSummary + '.' : ' No historical indicator values were returned.');
+                setState(document.getElementById('historical-outcome-state'), verdict, verdictClass);
+                document.getElementById('historical-outcome-detail').textContent = 'From $' + Number(outcome.entry_price || 0).toFixed(2) + ' to $' + Number(outcome.exit_price || 0).toFixed(2) + ' on ' + exitDate + ', price ' + move + ' ' + Math.abs(futureReturn * 100).toFixed(2) + '% over ' + horizon + ' trading days.';
+
+                if (sentiment.status === 'available') {
+                    const sentimentLabel = sentiment.state.charAt(0).toUpperCase() + sentiment.state.slice(1);
+                    const latestNewsDate = sentiment.as_of ? new Date(sentiment.as_of).toLocaleDateString() : result.cutoff_date;
+                    setState(document.getElementById('historical-sentiment-state'), sentimentLabel, analysisStateClass(sentiment.state));
+                    document.getElementById('historical-sentiment-detail').textContent = sentiment.article_count + ' eligible headlines (up to 50 analyzed) from the 30 days through ' + result.cutoff_date + ' classified as ' + sentiment.state + '. Latest eligible article: ' + latestNewsDate + '. News is context only; it does not change the strategy score.';
+                } else {
+                    const sentimentUnavailable = sentiment.status === 'error';
+                    setState(document.getElementById('historical-sentiment-state'), sentimentUnavailable ? 'Unavailable' : 'No cutoff news', 'state-pending');
+                    document.getElementById('historical-sentiment-detail').textContent = sentiment.message || 'No eligible historical news was available for this cutoff.';
+                }
+            }
+
+            async function compareHistoricalAnalysis() {
+                if (!historicalDate.value) {
+                    setHistoricalResult('Choose a cutoff date first.', 'neutral');
+                    return;
+                }
+                const symbol = activeHistoricalSymbol();
+                const params = new URLSearchParams({
+                    strategy: historicalStrategy.value,
+                    cutoff_date: historicalDate.value,
+                    horizon_days: historicalHorizon.value,
+                    period: '3mo'
+                });
+                const selectedDate = historicalDate.value;
+                setAnalysisView('historical');
+                setHistoricalResult('Evaluating ' + symbol + ' using only data available on ' + historicalDate.value + '...');
+                historicalMatrixResult = null;
+                historicalFailureMessage = '';
+                setHistoricalAnalysisBusy(true, symbol, selectedDate);
+                try {
+                    const response = await fetch('http://localhost:8000/api/stock/' + symbol + '/historical-evaluation?' + params);
+                    const result = await response.json();
+                    renderHistoricalPriceChart(result);
+                    renderHistoricalEvaluationChart(result);
+                    if (result.status !== 'available') throw new Error(result.message || 'Historical data unavailable');
+                    historicalMatrixResult = result;
+                    const outcome = result.outcome;
+                    const returnPercent = (outcome.future_return * 100).toFixed(2) + '%';
+                    const resultLabel = outcome.correct === null ? 'Neutral' : outcome.correct ? 'Correct' : 'Incorrect';
+                    const state = outcome.correct === null ? 'neutral' : outcome.correct ? 'correct' : 'incorrect';
+                    setHistoricalResult(resultLabel + ' | ' + symbol + ' produced a ' + outcome.signal.toUpperCase() + ' signal at $' + outcome.entry_price.toFixed(2) + '. After ' + result.horizon_days + ' trading days, it was $' + outcome.exit_price.toFixed(2) + ' (' + returnPercent + '). ' + result.warning, state);
+                    renderHistoricalEvidence(result);
+                    renderHistoricalMatrix(result);
+                } catch (error) {
+                    historicalFailureMessage = error.message || 'Historical analysis could not be completed.';
+                    setHistoricalResult(error.message || 'Historical comparison failed.', 'neutral');
+                    if (historicalEvidence) {
+                        historicalEvidence.innerHTML = '<div class="historical-evidence-empty">Historical evaluation failed. Check the selected cutoff date and strategy.</div>';
+                    }
+                } finally {
+                    setHistoricalAnalysisBusy(false, symbol, selectedDate);
+                }
+            }
+
+            historicalButton?.addEventListener('click', compareHistoricalAnalysis);
+            historicalDate.value = new Date(Date.now() - 90 * 86400000).toISOString().slice(0, 10);
+
+            const changeElement = document.getElementById('stat-change');
+            const stockElement = document.getElementById('current-symbol');
+            const technicalState = document.getElementById('technical-state');
+            const technicalDetail = document.getElementById('technical-detail');
+            const technicalMeter = document.getElementById('technical-meter');
+            const momentumState = document.getElementById('momentum-state');
+            const momentumDetail = document.getElementById('momentum-detail');
+            const volatilityState = document.getElementById('volatility-state');
+            const volatilityDetail = document.getElementById('volatility-detail');
+            const volatilitySource = document.getElementById('volatility-source');
+            const quantState = document.getElementById('quant-state');
+            const quantDetail = document.getElementById('quant-detail');
+            const quantSource = document.getElementById('quant-source');
+            const fundamentalState = document.getElementById('fundamental-state');
+            const fundamentalDetail = document.getElementById('fundamental-detail');
+            const fundamentalSource = document.getElementById('fundamental-source');
+            const sentimentState = document.getElementById('sentiment-state');
+            const sentimentDetail = document.getElementById('sentiment-detail');
+            const sentimentSource = document.getElementById('sentiment-source');
+            const macroState = document.getElementById('macro-state');
+            const macroDetail = document.getElementById('macro-detail');
+            const macroSource = document.getElementById('macro-source');
+            const readingTitle = document.getElementById('matrix-reading-title');
+            const readingDetail = document.getElementById('matrix-reading-detail');
+            let analysisRequestId = 0;
+            let analysisController = null;
+
+            function setState(element, label, stateClass) {
+                if (!element) return;
+                element.textContent = label;
+                element.className = 'lens-state ' + stateClass;
+            }
+
+            function updateMatrix() {
+                const rawChange = changeElement?.textContent || '';
+                const changeMatch = rawChange.match(/\((-?\d+(?:\.\d+)?)%\)/);
+                const change = changeMatch ? Number.parseFloat(changeMatch[1]) : NaN;
+                const symbol = stockElement?.textContent?.trim() || 'the selected asset';
+
+                if (!Number.isFinite(change)) return;
+
+                const positive = change > 0.15;
+                const negative = change < -0.15;
+                const direction = positive ? 'Positive' : negative ? 'Negative' : 'Mixed';
+                const stateClass = positive ? 'state-positive' : negative ? 'state-negative' : 'state-neutral';
+                const meterWidth = Math.min(100, Math.max(12, Math.abs(change) * 12));
+
+                setState(technicalState, direction, stateClass);
+                setState(momentumState, direction, stateClass);
+                technicalDetail.textContent = symbol + ' is ' + (positive ? 'above' : negative ? 'below' : 'near') + ' the selected period reference by ' + Math.abs(change).toFixed(2) + '%. This is price evidence, not a recommendation.';
+                momentumDetail.textContent = 'Recent price change is ' + (positive ? 'supportive' : negative ? 'weaker' : 'flat') + ', but relative strength needs a benchmark to confirm momentum.';
+                technicalMeter.style.width = meterWidth + '%';
+                technicalMeter.style.background = positive ? 'var(--green)' : negative ? 'var(--red)' : 'var(--yellow)';
+                readingTitle.textContent = direction + ' price evidence, incomplete picture';
+                readingDetail.textContent = 'Technical and momentum currently describe the same price move. Fundamental, volatility, sentiment, and quantitative sources are still missing, so no combined conclusion is shown.';
+            }
+
+            function analysisStateClass(state) {
+                if (state === 'positive' || state === 'contained') return 'state-positive';
+                if (state === 'negative' || state === 'elevated') return 'state-negative';
+                return 'state-neutral';
+            }
+
+            async function loadComparativeAnalysis() {
+                const stockSelect = document.getElementById('stock-select');
+                const symbol = stockSelect?.dataset.customSymbol || stockSelect?.value || 'AAPL';
+                const period = document.getElementById('period-select')?.value || '3mo';
+                const analysisPeriod = period === '1d' || period === '5d' ? '3mo' : period;
+                const requestId = ++analysisRequestId;
+
+                analysisController?.abort();
+                analysisController = new AbortController();
+
+                try {
+                    const response = await fetch(
+                        'http://localhost:8000/api/stock/' + symbol + '/analysis?benchmark=SPY&sector=XLK&period=' + analysisPeriod,
+                        { signal: analysisController.signal }
+                    );
+                    const result = await response.json();
+
+                    if (requestId !== analysisRequestId) return;
+
+                    if (result.status !== 'available') throw new Error(result.message || 'Analysis unavailable');
+
+                    const momentum = result.momentum;
+                    const volatility = result.volatility;
+                    const correlation = result.correlation;
+                    const fundamental = result.fundamental;
+                    const sentiment = result.sentiment;
+                    const macro = result.macro;
+                    const momentumLabel = momentum.state.charAt(0).toUpperCase() + momentum.state.slice(1);
+                    const volatilityLabel = volatility.state.charAt(0).toUpperCase() + volatility.state.slice(1);
+
+                    setState(momentumState, momentumLabel, analysisStateClass(momentum.state));
+                    momentumDetail.textContent = 'Relative return: ' + (momentum.relative_return * 100).toFixed(2) + '% vs ' + momentum.benchmark + '. Asset: ' + (momentum.asset_return * 100).toFixed(2) + '%; benchmark: ' + (momentum.benchmark_return * 100).toFixed(2) + '%.';
+                    setState(volatilityState, volatilityLabel, analysisStateClass(volatility.state));
+                    volatilityDetail.textContent = 'Realized volatility: ' + (volatility.realized_20d * 100).toFixed(1) + '%. ATR(14): ' + (volatility.atr_14_percent * 100).toFixed(1) + '%. Max drawdown: ' + (volatility.max_drawdown * 100).toFixed(1) + '%.';
+                    volatilitySource.textContent = 'Source: ' + result.source + ' | As of ' + new Date(result.as_of).toLocaleDateString();
+                    setState(quantState, 'Available', 'state-positive');
+                    quantDetail.textContent = 'Correlation with ' + correlation.benchmark + ': ' + correlation.benchmark_value.toFixed(2) + '. With ' + correlation.sector + ': ' + correlation.sector_value.toFixed(2) + '.';
+                    quantSource.textContent = 'Source: ' + result.source + ' | Returns aligned by date';
+                    if (fundamental.status === 'available') {
+                        const metrics = fundamental.metrics;
+                        setState(fundamentalState, 'Available', 'state-positive');
+                        fundamentalDetail.textContent = 'Revenue: ' + formatMoney(metrics.revenue) + '. Net income: ' + formatMoney(metrics.net_income) + '. Net margin: ' + formatPercent(metrics.net_margin) + '.';
+                        fundamentalSource.textContent = 'Source: SEC EDGAR | Filed ' + fundamental.as_of;
+                    } else {
+                        setState(fundamentalState, 'Needs setup', 'state-pending');
+                        fundamentalDetail.textContent = fundamental.message || 'SEC EDGAR fundamentals are not available yet.';
+                        fundamentalSource.textContent = 'Source: SEC EDGAR';
+                    }
+                    if (sentiment.status === 'available') {
+                        const sentimentLabel = sentiment.state.charAt(0).toUpperCase() + sentiment.state.slice(1);
+                        setState(sentimentState, sentimentLabel, analysisStateClass(sentiment.state));
+                        sentimentDetail.textContent = sentiment.article_count + ' recent headlines classified as ' + sentiment.state + '. This is a narrative summary, not a price signal.';
+                        sentimentSource.textContent = 'Source: ' + sentiment.source + ' | Latest: ' + new Date(sentiment.as_of).toLocaleDateString();
+                    } else {
+                        setState(sentimentState, 'Needs data', 'state-pending');
+                        sentimentDetail.textContent = sentiment.message || 'Recent news is not available yet.';
+                        sentimentSource.textContent = 'Source: Alpaca News';
+                    }
+                    if (macro.status === 'available') {
+                        const metrics = macro.metrics;
+                        setState(macroState, 'Available', 'state-positive');
+                        macroDetail.textContent = 'Fed funds: ' + formatMacro(metrics.FEDFUNDS) + '%. CPI: ' + formatMacro(metrics.CPIAUCSL) + '. Unemployment: ' + formatMacro(metrics.UNRATE) + '%. GDP: ' + formatMacro(metrics.GDPC1) + '.';
+                        macroSource.textContent = 'Source: FRED | Latest observations';
+                    } else {
+                        setState(macroState, 'Needs setup', 'state-pending');
+                        macroDetail.textContent = macro.message || 'FRED macro data is not available yet.';
+                        macroSource.textContent = 'Source: FRED';
+                    }
+                    readingTitle.textContent = momentumLabel + ' momentum, ' + volatilityLabel.toLowerCase() + ' volatility';
+                    readingDetail.textContent = 'Price evidence is compared with ' + momentum.benchmark + ' and ' + momentum.sector + '. Fundamental, sentiment, and macro sources remain separate until connected.';
+                } catch (error) {
+                    if (error.name === 'AbortError' || requestId !== analysisRequestId) return;
+                    setState(fundamentalState, 'Pending', 'state-pending');
+                    setState(sentimentState, 'Pending', 'state-pending');
+                    setState(macroState, 'Pending', 'state-pending');
+                    setState(volatilityState, 'Pending', 'state-pending');
+                    setState(quantState, 'Pending', 'state-pending');
+                    volatilityDetail.textContent = 'Waiting for comparative daily data from Alpaca.';
+                    quantDetail.textContent = 'Waiting for aligned benchmark data from Alpaca.';
+                }
+            }
+
+            function formatMoney(value) {
+                if (value === null || value === undefined) return 'n/a';
+                return new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(value);
+            }
+
+            function formatPercent(value) {
+                return value === null || value === undefined ? 'n/a' : (value * 100).toFixed(1) + '%';
+            }
+
+            function formatMacro(metric) {
+                return metric && metric.value !== undefined ? metric.value.toFixed(2) : 'n/a';
+            }
+
+            const observer = new MutationObserver(updateMatrix);
+            if (changeElement) observer.observe(changeElement, { childList: true, characterData: true, subtree: true });
+            document.getElementById('stock-select')?.addEventListener('change', () => {
+                updateMatrix();
+                loadComparativeAnalysis();
+            });
+            document.getElementById('period-select')?.addEventListener('change', () => {
+                loadComparativeAnalysis();
+            });
+            if (stockElement) {
+                new MutationObserver(() => {
+                    updateMatrix();
+                    loadComparativeAnalysis();
+                }).observe(stockElement, { childList: true, characterData: true, subtree: true });
+            }
+            updateMatrix();
+            loadComparativeAnalysis();
+        }());
+    </script>
+    <script>
+        (function () {
+            const currentInput = document.getElementById('custom-symbol-input');
+            const currentButton = document.getElementById('custom-symbol-btn');
+            const historicalInput = document.getElementById('historical-symbol-input');
+            const historicalButton = document.getElementById('historical-symbol-btn');
+            const stockSelect = document.getElementById('stock-select');
+
+            function applySelectedSymbol(symbol) {
+                const normalizedSymbol = symbol.trim().toUpperCase();
+                if (!normalizedSymbol) return;
+
+                if (currentInput) currentInput.value = normalizedSymbol;
+                if (historicalInput) historicalInput.value = normalizedSymbol;
+                if (stockSelect) delete stockSelect.dataset.customSymbol;
+                currentButton?.click();
+            }
+
+            function bindSearchWidget(input, button, prefix, onSelect) {
+                const suggestionsBox = document.getElementById(prefix + '-suggestions');
+                const searchStatus = document.getElementById(prefix + '-status');
+                if (!input || !suggestionsBox || !searchStatus) return;
+
+                let debounceTimer = null;
+                let activeRequest = null;
+                let requestVersion = 0;
+                let suggestions = [];
+                let activeIndex = -1;
+
+                function closeSuggestions() {
+                    suggestionsBox.hidden = true;
+                    input.setAttribute('aria-expanded', 'false');
+                    input.removeAttribute('aria-activedescendant');
+                    activeIndex = -1;
+                }
+
+                function showSearchMessage(message) {
+                    suggestionsBox.replaceChildren();
+                    searchStatus.textContent = message;
+                    searchStatus.hidden = false;
+                    suggestionsBox.appendChild(searchStatus);
+                    suggestionsBox.hidden = false;
+                    input.setAttribute('aria-expanded', 'true');
+                }
+
+                function chooseSuggestion(index) {
+                    const suggestion = suggestions[index];
+                    if (!suggestion) return;
+                    input.value = suggestion.symbol;
+                    closeSuggestions();
+                    activeRequest?.abort();
+                    onSelect(suggestion.symbol);
+                }
+
+                function setActiveSuggestion(index) {
+                    if (!suggestions.length) return;
+                    activeIndex = (index + suggestions.length) % suggestions.length;
+                    suggestions.forEach((suggestion, suggestionIndex) => {
+                        const option = document.getElementById(prefix + '-option-' + suggestionIndex);
+                        const active = suggestionIndex === activeIndex;
+                        option?.classList.toggle('is-active', active);
+                        option?.setAttribute('aria-selected', String(active));
+                    });
+                    input.setAttribute('aria-activedescendant', prefix + '-option-' + activeIndex);
+                }
+
+                function renderSuggestions(results) {
+                    suggestions = results;
+                    activeIndex = -1;
+                    suggestionsBox.replaceChildren();
+                    searchStatus.hidden = true;
+
+                    if (!results.length) {
+                        showSearchMessage('No matching stocks found. You can still enter a ticker directly.');
+                        return;
+                    }
+
+                    results.forEach((result, index) => {
+                        const option = document.createElement('button');
+                        option.id = prefix + '-option-' + index;
+                        option.type = 'button';
+                        option.className = 'stock-search-option';
+                        option.setAttribute('role', 'option');
+                        option.setAttribute('aria-selected', 'false');
+
+                        const symbol = document.createElement('span');
+                        symbol.className = 'stock-search-option-symbol';
+                        symbol.textContent = result.symbol;
+
+                        const name = document.createElement('span');
+                        name.className = 'stock-search-option-name';
+                        name.textContent = result.name;
+
+                        const exchange = document.createElement('span');
+                        exchange.className = 'stock-search-option-exchange';
+                        exchange.textContent = result.exchange || '';
+
+                        option.append(symbol, name, exchange);
+                        option.addEventListener('mousedown', (event) => event.preventDefault());
+                        option.addEventListener('click', () => chooseSuggestion(index));
+                        suggestionsBox.appendChild(option);
+                    });
+
+                    suggestionsBox.hidden = false;
+                    input.setAttribute('aria-expanded', 'true');
+                }
+
+                async function searchStocks(query, version) {
+                    showSearchMessage('Searching stocks...');
+                    activeRequest = new AbortController();
+
+                    try {
+                        const origin = 'http://' + window.location.hostname + ':8000';
+                        const params = new URLSearchParams({ q: query, limit: '8' });
+                        const response = await fetch(origin + '/api/stocks/search?' + params, {
+                            signal: activeRequest.signal
+                        });
+                        if (!response.ok) throw new Error('Stock search request failed.');
+
+                        const result = await response.json();
+                        if (version !== requestVersion || input.value.trim() !== query) return;
+                        renderSuggestions(result.results || []);
+                    } catch (error) {
+                        if (error.name === 'AbortError' || version !== requestVersion) return;
+                        const apiHost = window.location.hostname || 'localhost';
+                        showSearchMessage('Cannot reach stock search at ' + apiHost + ':8000. Check that the TradingApp API is running; you can still enter a ticker directly.');
+                    }
+                }
+
+                input.addEventListener('input', () => {
+                    const query = input.value.trim();
+                    window.clearTimeout(debounceTimer);
+                    activeRequest?.abort();
+                    requestVersion += 1;
+                    suggestions = [];
+                    activeIndex = -1;
+
+                    if (query.length < 2) {
+                        closeSuggestions();
+                        return;
+                    }
+
+                    const version = requestVersion;
+                    debounceTimer = window.setTimeout(() => searchStocks(query, version), 250);
+                });
+
+                input.addEventListener('keydown', (event) => {
+                    if (event.key === 'Escape') {
+                        closeSuggestions();
+                        return;
+                    }
+
+                    if (suggestionsBox.hidden || !suggestions.length) return;
+                    if (event.key === 'ArrowDown') {
+                        event.preventDefault();
+                        setActiveSuggestion(activeIndex + 1);
+                    } else if (event.key === 'ArrowUp') {
+                        event.preventDefault();
+                        setActiveSuggestion(activeIndex < 0 ? suggestions.length - 1 : activeIndex - 1);
+                    } else if (event.key === 'Enter' && activeIndex >= 0) {
+                        event.preventDefault();
+                        event.stopImmediatePropagation();
+                        chooseSuggestion(activeIndex);
+                    }
+                });
+
+                input.addEventListener('blur', () => {
+                    window.setTimeout(closeSuggestions, 120);
+                });
+
+                button?.addEventListener('click', () => onSelect(input.value));
+            }
+
+            if (historicalInput && stockSelect) {
+                historicalInput.value = stockSelect.dataset.customSymbol || stockSelect.value || 'AAPL';
+                historicalInput.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        historicalButton?.click();
+                    }
+                });
+                stockSelect.addEventListener('change', () => {
+                    historicalInput.value = stockSelect.dataset.customSymbol || stockSelect.value || 'AAPL';
+                });
+            }
+
+            bindSearchWidget(currentInput, null, 'stock-search', applySelectedSymbol);
+            bindSearchWidget(historicalInput, historicalButton, 'historical-stock-search', applySelectedSymbol);
+
+            currentButton?.addEventListener('click', () => {
+                if (historicalInput && currentInput.value.trim()) {
+                    historicalInput.value = currentInput.value.trim().toUpperCase();
+                }
+            });
+        }());
+    </script>
+    <script src="app.js?v=20260922-3"></script>
+
+</body>
+</html>
