@@ -15,3 +15,4 @@ backend/.env
 *.db
 *.sqlite
 *.sqlite3
+.claude/settings.json
