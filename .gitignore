@@ -16,3 +16,4 @@ backend/.env
 *.sqlite
 *.sqlite3
 .claude/settings.json
+.claude/settings.json
