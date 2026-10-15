@@ -9,3 +9,4 @@ psycopg2-binary==2.9.9
 redis==5.0.1
 aiohttp==3.9.1
 python-multipart==0.0.6
+numpy==1.26.4
