@@ -2154,10 +2154,12 @@
                 analysisController = new AbortController();
 
                 try {
-                    const response = await fetch(
-                        'http://localhost:8000/api/stock/' + symbol + '/analysis?benchmark=SPY&sector=XLK&period=' + analysisPeriod,
-                        { signal: analysisController.signal }
-                    );
+                    const url =
+                        `${API_ORIGIN}/api/stock/${encodeURIComponent(symbol)}/analysis` +
+                        '?benchmark=SPY&sector=XLK&period=1mo';
+
+                    const response = await fetch(url);
+                    
                     const result = await response.json();
 
                     if (requestId !== analysisRequestId) return;

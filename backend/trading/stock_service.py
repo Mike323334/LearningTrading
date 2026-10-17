@@ -382,11 +382,7 @@ class StockService:
                         f"{note or data}"
                     )
 
-                    return self._get_mock_historical(
-                        symbol,
-                        period,
-                        interval
-                    )
+                    return []
 
                 for bar in bars:
 
@@ -410,11 +406,7 @@ class StockService:
                     f"({period}, {interval})"
                 )
 
-                return self._get_mock_historical(
-                    symbol,
-                    period,
-                    interval
-                )
+                return []
 
             bars_per_trading_day = {
                 "1Min": 390,
@@ -437,11 +429,7 @@ class StockService:
                 f"Error fetching historical data for {symbol}: {e}"
             )
 
-            return self._get_mock_historical(
-                symbol,
-                period,
-                interval
-            )
+            return []
 
     # -----------------------------------------------------------------
     # Comparative analysis
