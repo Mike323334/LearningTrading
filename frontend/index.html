@@ -2053,7 +2053,7 @@
                 historicalFailureMessage = '';
                 setHistoricalAnalysisBusy(true, symbol, selectedDate);
                 try {
-                    const response = await fetch('http://localhost:8000/api/stock/' + symbol + '/historical-evaluation?' + params);
+                    const response = await fetch('https://localhost:8000/api/stock/' + symbol + '/historical-evaluation?' + params);
                     const result = await response.json();
                     renderHistoricalPriceChart(result);
                     renderHistoricalEvaluationChart(result);
@@ -2371,11 +2371,17 @@
                     activeRequest = new AbortController();
 
                     try {
-                        const origin = 'http://' + window.location.hostname + ':8000';
-                        const params = new URLSearchParams({ q: query, limit: '8' });
-                        const response = await fetch(origin + '/api/stocks/search?' + params, {
-                            signal: activeRequest.signal
+                       const params = new URLSearchParams({
+                            q: query,
+                            limit: '8'
                         });
+
+                        const response = await fetch(
+                            `${API_ORIGIN}/api/stocks/search?${params}`,
+                            {
+                                signal: activeRequest.signal
+                            }
+                        );
                         if (!response.ok) throw new Error('Stock search request failed.');
 
                         const result = await response.json();
